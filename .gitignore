@@ -1,0 +1,9 @@
+*.log
+*.swp
+*.tar.gz
+*.tar.xz
+*.zip
+**/.DS_Store
+**/desktop.ini
+**/Thumbs.db
+**/__pycache__/
