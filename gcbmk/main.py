@@ -136,57 +136,77 @@ games = {
 
 games = saveSizes.copy()
 
-sortedGames = dict(
-    sorted(games.items(), key=lambda item: item[1], reverse=True)
-)
+sortedGames = dict(sorted(games.items(), key=lambda item: item[1], reverse=True))
 
 
-def nextItem(card: dict, cardSize: int, games: dict, currentItems: list) -> str:
-    #print(f"Current Items: {currentItems}")
-    usedBlocks = 0
-    for item in currentItems:
-        usedBlocks += saveSizes[item]
-    remainingBlocks = cardSize - usedBlocks
-    #print(f"Remaining Blocks: {remainingBlocks}")
-    if remainingBlocks == 0:
-        return None
-    possibleGames = {k: v for k, v in games.items() if v <= remainingBlocks}
-    #print(f"Possible Games: {possibleGames}")
-    largestGame = next(iter(possibleGames.keys()), None)
-    #print(f"Largest Game: {largestGame}")
-    return largestGame
+class firstFit:
+    def __init__(self, itemSizes: dict, binSize: int):
+        self.itemSizes = itemSizes
+        self.binSize = binSize
 
-def createCard(games: dict, cardSize: int) -> list:
-    card = {}
-    currentItems = games.keys()
-    currentItems = []
-    next_item = nextItem(card, cardSize, games, currentItems)
-    while next_item != None:
-        currentItems.append(next_item)
-        games.pop(next_item)
-        next_item = nextItem(card, cardSize, games, currentItems)
-    #print(currentItems)
-    return currentItems
+    def get_items(self, items: list) -> dict:
+        items_dict = {}
+        for item in items:
+            size = self.itemSizes[item]
+            items_dict.update({item: size})
+        sortedGames = dict(
+            sorted(items_dict.items(), key=lambda item: item[1], reverse=True)
+        )
+        return sortedGames
 
-def pack_bin(games: dict, cardSize: int) -> dict:
-    remaining_games = games.copy()
-    cards = {}
-    i = 0
-    new_card = createCard(remaining_games, cardSize)
-    while remaining_games and new_card:
-        i += 1
-        cards.update({i: new_card})
-        new_card = createCard(remaining_games, cardSize)
-    return cards
+    def nextItem(self, remaining_games: dict, currentItems: list) -> str:
+        cardSize = self.binSize
+        usedBlocks = 0
+        for item in currentItems:
+            usedBlocks += self.itemSizes[item]
+        remainingBlocks = cardSize - usedBlocks
+        if remainingBlocks == 0:
+            return None
+        possibleGames = {
+            k: v for k, v in remaining_games.items() if v <= remainingBlocks
+        }
+        largestGame = next(iter(possibleGames.keys()), None)
+        return largestGame
+
+    def createCard(self, remaining_games: dict) -> list:
+        cardSize = self.binSize
+        currentItems = []
+        next_item = self.nextItem(remaining_games, currentItems)
+        while next_item != None:
+            currentItems.append(next_item)
+            remaining_games.pop(next_item)
+            next_item = self.nextItem(remaining_games, currentItems)
+        return currentItems
+
+    def pack_bin(self, games: dict) -> dict:
+        cardSize = self.binSize
+        remaining_games = games.copy()
+        cards = {}
+        i = 0
+        new_card = self.createCard(remaining_games)
+        while remaining_games and new_card:
+            i += 1
+            cards.update({i: new_card})
+            new_card = self.createCard(remaining_games)
+        return cards
+
+    def get_bins(self, items: list) -> dict:
+        items_dict = self.get_items(items)
+        bins = self.pack_bin(items_dict)
+        return bins
+
 
 def print_bin(bins: dict):
     for bin in bins:
-        print(bin, '\n', '---')
+        print(bin, "\n", "---")
         for item in bins[bin]:
             print(item, saveSizes[item])
-        print('\n')
+        print("\n")
 
 
+# bins = pack_bin(sortedGames, 59)
+# print_bin(bins)
 
-bins = pack_bin(sortedGames, 59)
+ff = firstFit(sortedGames, 59)
+bins = ff.get_bins(list(games.keys()))
 print_bin(bins)
