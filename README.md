@@ -11,7 +11,7 @@ $ python3 ./main.py
 ```
 
 ## lmc
-Language: C99
+Language: C99 + Python
 
 An implementation of the Little Man Computer instruction set. Note: only the binary codes, no assembler.
 
