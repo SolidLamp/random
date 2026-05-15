@@ -84,6 +84,8 @@ def assembleline(line: str) -> None | int | str:
         return f"Keyword {words[0]} is invalid."
     instruction: str = ""
     instruction += KEYWORDS[words[0].upper()]
+    if words[0].upper() == "DAT" and len(words) > 1:
+        instruction = "0"
     words.pop(0)
     if len(instruction) == 3:
         return int(instruction)
@@ -97,6 +99,8 @@ def assembleline(line: str) -> None | int | str:
         except:
             return "Non-integer operand."
     operand = str(operand % 99)
+    if len(operand) == 1:
+        operand = "0" + operand
     return int(instruction + operand)
 
 

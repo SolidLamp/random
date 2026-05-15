@@ -37,7 +37,7 @@ void run_cpu(uint16_t instructions[], int input_len)
     print_arr(&mem);
     printf("\n");
     int arr_len = sizeof(mem.arr) / sizeof(mem.arr[0]);
-    for (int i = 0; i < arr_len; i++) {
+    for (;;) {
         decode(&mem, get_next_instruction(&mem));
         /* printf("Current instruction:  %d", pc); */
         handle_opcode(&mem, mem.ir);
